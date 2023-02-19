@@ -7,7 +7,7 @@ Deep Q Learning is an off-policy, value-based reinforcement learning approach th
 
 Here's an outline to the algorithm researches at DeepMind used in their paper reference above. 
 
-<img src="https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/9503738f9878386f399b3a000eb126d8f01021bd/minion_navigation/media/dqn_algo.png"  width="500" alt="DQN algorithm">
+<img src="https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/9503738f9878386f399b3a000eb126d8f01021bd/minion_navigation/media/dqn_algo.png"  width="600" alt="DQN algorithm">
 
 The Q network is parameterized as a neural network with 37 inputs, 4 outputs and 2 hidden layers of 128 nodes each. 
 ReLU is used as the activation function.
