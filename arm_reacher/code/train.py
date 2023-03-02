@@ -51,7 +51,8 @@ def train(env, brain_name, agent, num_episodes, max_time_per_episode, score_acce
     :return: The averaged scores and the episode at which the agent scores above the acceptance threshold.
     """
     # Track scores.
-    averaged_scores = deque(maxlen=print_every)
+    averaged_scores = []
+    averaged_scores_window = deque(maxlen=print_every)
     num_episodes_to_acceptance_threshold = None
 
     # Initialize standard deviation for the action noise.
@@ -89,10 +90,13 @@ def train(env, brain_name, agent, num_episodes, max_time_per_episode, score_acce
 
         # Keep track of scores.
         averaged_scores.append(np.mean(score))
-        print('\rEpisode {}\tAverage Score: {:.2f}'.format(episode_idx, np.mean(averaged_scores)), end="")
-        if np.mean(averaged_scores) >= score_acceptance_threshold and num_episodes_to_acceptance_threshold is not None:
-            num_episodes_to_acceptance_threshold = episode_idx
+        averaged_scores_window.append(np.mean(score))
+        print('\rEpisode {}\tAverage Score: {:.2f}'.format(episode_idx, np.mean(averaged_scores_window)), end="")
+        if episode_idx >= len(averaged_scores_window) and np.mean(
+                averaged_scores_window) >= score_acceptance_threshold and num_episodes_to_acceptance_threshold is None:
+            num_episodes_to_acceptance_threshold = episode_idx - len(averaged_scores_window)
         if episode_idx % print_every == 0:
-            print('\rEpisode {}\tAverage Score: {:.2f}'.format(episode_idx, np.mean(averaged_scores)))
+            print('\rEpisode {}\tAverage Score (over 100 consecutive episodes): {:.2f}'.format(episode_idx, np.mean(
+                averaged_scores_window)))
 
     return averaged_scores, num_episodes_to_acceptance_threshold

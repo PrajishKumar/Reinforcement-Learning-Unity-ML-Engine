@@ -47,6 +47,10 @@ The hyperparameters used for training:
 | minimum standard deviation of noise applied to the actions                | 0.01                         |
 | decay rate standard deviation of noise applied to the actions per episode | 0.99                         |
 
+Policies for agents with continuous actions are known to perform well when they are trained with some noise on the chosen actions. 
+Instead of Ornstein-Uhlenbeck noise, we opted for a simple Gaussian noise with a zero mean. 
+However, over the course of training, we gradually decrease the applied noise. 
+
 ### Result
 
 Performance of the agent after training for 2000 episodes:
