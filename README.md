@@ -7,3 +7,10 @@ Playground for exploring RL algorithms with the Unity Machine Learning Agents To
 Performance of the agent after training to pick only the yellow bananas:
 
 ![](https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/9503738f9878386f399b3a000eb126d8f01021bd/minion_navigation/media/banana_nav.gif)
+
+
+## Project: Arm Reacher with DDPG ([more details](https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/tree/main/arm_reacher))
+
+Performance of the agent (robotic arm) after training to track the moving green targets:
+
+![](https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/main/arm_reacher/media/successful_test.gif)
