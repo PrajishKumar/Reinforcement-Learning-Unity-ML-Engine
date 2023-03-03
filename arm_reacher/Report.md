@@ -9,7 +9,7 @@ action spaces.
 The algorithm concurrently learns a Q-function and a policy.
 It uses off-policy data and the Bellman equation to learn the Q-function, and uses the Q-function to learn the policy.
 
-Here's the psuedocode of the algorithm [source](https://spinningup.openai.com/en/latest/algorithms/ddpg.html)
+Here's the psuedocode of the algorithm [[source]](https://spinningup.openai.com/en/latest/algorithms/ddpg.html)
 
 <img src="https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/main/arm_reacher/media/ddpg_algo.png"  width="600" alt="DDPG algorithm">
 
@@ -62,7 +62,7 @@ Plot of score over time of training:
 
 <img src="https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/main/arm_reacher/media/scores_plot.png" width="500" alt="Scores Plot"/>
 
-The agent first scored more than 30 (averaged over 100 episodes) at episode number 99.
+The agent first scored more than 30 (averaged over 100 episodes, and over 20 agents) at episode number 99.
 As in, from episode 99 to 198, the averaged scores across all agents was consistently above 30.
 However, we decided to run the training for longer in the hope that the agent might end up getting even more scores.
 
