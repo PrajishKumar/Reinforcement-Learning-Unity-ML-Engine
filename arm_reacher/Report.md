@@ -45,7 +45,7 @@ The hyperparameters used for training:
 | interpolation parameter for target network update                         | 0.001                        |
 | maximum standard deviation of noise applied to the actions                | 0.1                          |
 | minimum standard deviation of noise applied to the actions                | 0.01                         |
-| decay rate standard deviation of noise applied to the actions per episode | 0.99                         |
+| decay rate standard deviation of noise applied to the actions per episode | 0.995                        |
 
 Policies for agents with continuous actions are known to perform well when they are trained with some noise on the chosen actions. 
 Instead of Ornstein-Uhlenbeck noise, we opted for a simple Gaussian noise with a zero mean. 
