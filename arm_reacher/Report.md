@@ -11,7 +11,7 @@ It uses off-policy data and the Bellman equation to learn the Q-function, and us
 
 Here's the psuedocode of the algorithm [source](https://spinningup.openai.com/en/latest/algorithms/ddpg.html)
 
-<img src="https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/9503738f9878386f399b3a000eb126d8f01021bd/arm_reacher/media/ddpg_algo.png"  width="600" alt="DDPG algorithm">
+<img src="https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/main/arm_reacher/media/ddpg_algo.png"  width="600" alt="DDPG algorithm">
 
 The actor network is parameterized as a neural network with 33 inputs, 4 outputs and 3 hidden layers with 512, 256 and
 128 nodes.
@@ -19,7 +19,7 @@ ReLU is used as the activation function for the hidden layers.
 The output of the neural network is supposed to represent the actions in the range [-1, +1].
 Therefore, the final layer is passed through a `tanh` activation function to clip the actions to the required range.
 
-<img src="https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/9503738f9878386f399b3a000eb126d8f01021bd/arm_reacher/media/actor.png"  width="500" alt="DQN algorithm">
+<img src="https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/main/arm_reacher/media/actor.png"  width="500" alt="DQN algorithm">
 
 The critic network is parameterized as a neural network with 37 inputs, 1 outputs and 3 hidden layers with 512, 256 and
 128 nodes.
@@ -29,7 +29,7 @@ The input to the critic network is a concatenated vector of the 33 states and th
 The output is a scalar that represents the estimate of the action-value of the state-action pair passed into the
 network.
 
-<img src="https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/9503738f9878386f399b3a000eb126d8f01021bd/arm_reacher/media/critic.png"  width="500" alt="DQN algorithm">
+<img src="https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/main/arm_reacher/media/critic.png"  width="500" alt="DQN algorithm">
 
 The hyperparameters used for training:
 
@@ -55,11 +55,11 @@ However, over the course of training, we gradually decrease the applied noise.
 
 Performance of the agent after training for 2000 episodes:
 
-![](https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/9503738f9878386f399b3a000eb126d8f01021bd/arm_reacher/media/successful_test.gif)
+![](https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/main/arm_reacher/media/successful_test.gif)
 
 Plot of score over time of training:
 
-![](https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/9503738f9878386f399b3a000eb126d8f01021bd/arm_reacher/media/scores_plot.png)
+![](https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/main/arm_reacher/media/scores_plot.png)
 
 The agent first scored more than 30 (averaged over 100 episodes) at episode number 99.
 However, we decided to run the training for longer in the hope that the agent might end up getting even more scores.
