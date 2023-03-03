@@ -55,38 +55,21 @@ However, over the course of training, we gradually decrease the applied noise.
 
 Performance of the agent after training for 2000 episodes:
 
-![](https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/9503738f9878386f399b3a000eb126d8f01021bd/minion_navigation/media/banana_nav.gif)
+![](https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/9503738f9878386f399b3a000eb126d8f01021bd/arm_reacher/media/successful_test.gif)
 
 Plot of score over time of training:
 
-![](https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/9503738f9878386f399b3a000eb126d8f01021bd/minion_navigation/media/plot_result.png)
+![](https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/9503738f9878386f399b3a000eb126d8f01021bd/arm_reacher/media/scores_plot.png)
 
-The agent first scored more than 13 (averaged over 100 episodes) at episode number 572.
+The agent first scored more than 30 (averaged over 100 episodes) at episode number 99.
 However, we decided to run the training for longer in the hope that the agent might end up getting even more scores.
 
 ```
-Episode 100	Average Score: 0.80
-Episode 200	Average Score: 4.09
-Episode 300	Average Score: 6.81
-Episode 400	Average Score: 10.10
-Episode 500	Average Score: 12.01
-Episode 600	Average Score: 12.99
-Episode 700	Average Score: 14.59
-Episode 800	Average Score: 14.15
-Episode 900	Average Score: 13.89
-Episode 1000	Average Score: 15.45
-Episode 1100	Average Score: 14.40
-Episode 1200	Average Score: 15.11
-Episode 1300	Average Score: 15.08
-Episode 1400	Average Score: 14.27
-Episode 1500	Average Score: 14.91
-Episode 1600	Average Score: 14.98
-Episode 1700	Average Score: 14.57
-Episode 1800	Average Score: 15.09
-Episode 1900	Average Score: 15.77
-Episode 2000	Average Score: 16.34
+Episode 100	Average Score (over 100 consecutive episodes): 8.94
+Episode 200	Average Score (over 100 consecutive episodes): 30.14
+Episode 300	Average Score (over 100 consecutive episodes): 34.86
 
-Our minion learnt to get a score of 13.0 in 572 episodes.
+Our arm learnt to get a score of 30.0           in 99 episodes.
 ```
 
 ### Ideas for Future Work
