@@ -46,6 +46,7 @@ The hyperparameters used for training:
 | maximum standard deviation of noise applied to the actions                | 0.1                          |
 | minimum standard deviation of noise applied to the actions                | 0.01                         |
 | decay rate standard deviation of noise applied to the actions per episode | 0.995                        |
+| timesteps in an episode                                                   | 1000                         |
 
 Policies for agents with continuous actions are known to perform well when they are trained with some noise on the chosen actions. 
 Instead of Ornstein-Uhlenbeck noise, we opted for a simple Gaussian noise with a zero mean. 
@@ -53,15 +54,16 @@ However, over the course of training, we gradually decrease the applied noise.
 
 ### Result
 
-Performance of the agent after training for 2000 episodes:
+Performance of the agent after training for 300 episodes:
 
 ![](https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/main/arm_reacher/media/successful_test.gif)
 
 Plot of score over time of training:
 
-![](https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/main/arm_reacher/media/scores_plot.png)
+<img src="https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/main/arm_reacher/media/scores_plot.png" width="500" alt="Scores Plot"/>
 
 The agent first scored more than 30 (averaged over 100 episodes) at episode number 99.
+As in, from episode 99 to 198, the averaged scores across all agents was consistently above 30.
 However, we decided to run the training for longer in the hope that the agent might end up getting even more scores.
 
 ```
@@ -74,24 +76,29 @@ Our arm learnt to get a score of 30.0           in 99 episodes.
 
 ### Ideas for Future Work
 
-Upon testing the trained agent in the task, the agent seems to perform optimally.
-The agent quickly realises not to waste time meandering around while collecting bananas.
-The agent also adapts very quickly when new bananas are spawned nearby too.
-Overall, it looks like the agent performs just as good, if not better, than how a human operator would have in this
-task.
+Given that we run an episode for 1000 timesteps, the maximum score an agent can get is $1000 \times 0.1 = 100$. 
+Our trained agent gets a score of just above 30 pretty soon, but the score does not really improve after. 
+When one looks at the performance of the agent, it visually appears to track just fine.
 
 However, some improvements could be tried:
 
-1. Implementing a double DQN is, honestly, a low-hanging fruit.
-   One could attempt this minor change in TD target calculations and at least try to explore if it provides any
-   significant benefit to the learning curve.
+1. **Implementing a prioritized replay buffer.**
+   
+   Our replay buffer has a capacity of 1 million experiences. 
+   And for 20 agents, with an episode containing 1000 experiences, it is equivalent to storing 50 episodes worth of experiences. 
+   That's a good enough number, however, we see that the agent's behaviour starts converging around 100 episodes. 
+   That would mean that the experiences in the buffer, on average, produce the same behavior. 
+   
+   It's at this stage, one might want to treat experiences with higher expected returns favorably. 
+   And we can do that by sampling those experiences with higher expected returns with higher probability.  
 
-2. We see that the average score plateaus around 15 starting around 700 episodes.
-   At this point, the agent is generally good.
-   But to be exceptionally good, the agent, after some time has passed, might benefit from re-collecting those rare
-   events in the past where it might have made a maneuver that resulting in collecting a lot of points in a short
-   duration.  
-   A prioritized experience replay would have weighed such experiences with a higher priority and we might have visited
-   such tuples more often in our learning.  
+2. **Providing a baseline in the policy improvement step.**
 
+   In other actor-critic methods, such as A2C and A3C, we use a baseline in the policy update step. 
+   The baseline could be a simple average of rewards obtained, or could be an estimate of the advantage. 
+   The idea of a baseline is to selectively favor actions that lead to returns higher than the expected value from the baseline. 
+   
+   This is very useful when the agent seems to have converged to suboptimal behaviors. 
+   A baseline will roughly split the experiences into two halves - ones from which we can learn to do better and the others on what not to do. 
+   This selective learning could improve the agent's performance even more. 
 
