@@ -50,20 +50,20 @@ network.
 
 The hyperparameters used for training:
 
-| **Hyperparameter**                                                        | **Value**               |
-|---------------------------------------------------------------------------|-------------------------|
-| replay buffer size                                                        | 100,000                 |
-| minibatch size of sampling from replay buffer                             | 128                     |
-| target network update frequency                                           | 1 updates every episode |
-| discount factor                                                           | 0.99                    |
-| learning rate of actor                                                    | 0.0001                  |
-| learning rate of critic                                                   | 0.0001                  |
-| weight decay of critic                                                    | 0                       |
-| interpolation parameter for target network update                         | 0.001                   |
-| maximum standard deviation of noise applied to the actions                | 0.5                     |
-| minimum standard deviation of noise applied to the actions                | 0.01                    |
-| decay rate standard deviation of noise applied to the actions per episode | 0.995                   |
-| timesteps in an episode                                                   | 1000                    |
+| **Hyperparameter**                                                        | **Value**              |
+|---------------------------------------------------------------------------|------------------------|
+| replay buffer size                                                        | 100,000                |
+| minibatch size of sampling from replay buffer                             | 128                    |
+| target network update frequency                                           | 1 update every episode |
+| discount factor                                                           | 0.99                   |
+| learning rate of actor                                                    | 0.0001                 |
+| learning rate of critic                                                   | 0.0001                 |
+| weight decay of critic                                                    | 0                      |
+| interpolation parameter for target network update                         | 0.001                  |
+| maximum standard deviation of noise applied to the actions                | 0.5                    |
+| minimum standard deviation of noise applied to the actions                | 0.01                   |
+| decay rate standard deviation of noise applied to the actions per episode | 0.995                  |
+| maximum timesteps in an episode                                           | 1000                   |
 
 Policies for agents with continuous actions are known to perform well when they are trained with some noise on the
 chosen actions.
@@ -82,7 +82,7 @@ Performance of the agent after training for 4300 episodes:
 
 Our agents received a score of more than 0.5 (averaged over 100 episodes) at episode number 4173.
 However, we decided to run the training for longer in the hope that the agent might end up getting even more scores.
-We stopped when the score was around 1.
+We stopped when the average score was around 1.
 
 ```
 Episode 100	Average Score: 0.003000
@@ -141,7 +141,7 @@ Episode 4300	Average Score: 1.152500
    a
    little sparse.
 
-   So, it becomes important that we favor experiences that produced high rewards when we sample experiences from the
+   So, it becomes important that we favor experiences that produced higher rewards when we sample experiences from the
    replay buffer.
 
 2. **Providing a baseline in the policy improvement step.**
@@ -151,23 +151,23 @@ Episode 4300	Average Score: 1.152500
    The idea of a baseline is to selectively favor actions that lead to returns higher than the expected value from the
    baseline.
 
-   This might be useful at the start since out agents seems to be not learning that well initially.
+   This might be useful at the initial phase of training since our agents seem to be learning poorly.
    A baseline will roughly split the experiences into two halves - ones from which we can learn to do better and the
    others on what not to do.
-   This selective learning could improve the agents' performance even more.
+   This selective learning could have improved the agents' performance even more.
 
 3. **Applying batch normalization.**
 
    Applying batch normalization to neural networks is known to help the agent converge
-   faster [source](https://arxiv.org/pdf/1502.03167.pdf).
-   We could have tried that with our actor and critic networks.
+   faster [[source]](https://arxiv.org/pdf/1502.03167.pdf).
+   We could apply that to our actor and critic networks.
 
 4. **Using D4PG over DDPG.**
 
    Using D4PG seems promising for our
-   application [source](https://www.researchgate.net/publication/348367411_Multi-Agent_Reinforcement_Learning_using_the_Deep_Distributed_Distributional_Deterministic_Policy_Gradients_Algorithm).
-   D4PG is also an off-policy actor-critic learning algorithm but is known to provide better gradients and thus more
-   stable learning signal.
+   application [[source]](https://www.researchgate.net/publication/348367411_Multi-Agent_Reinforcement_Learning_using_the_Deep_Distributed_Distributional_Deterministic_Policy_Gradients_Algorithm).
+   D4PG is also an off-policy actor-critic learning algorithm but is known to provide better gradients leading to
+   more stable learning.
    Moreover, the D4PG algorithm runs many actors in parallel with all feeding into a single replay buffer, executing a
    sophisticated distributed way to gather the experience, and as a result, a significant time saving can be achieved.
 
