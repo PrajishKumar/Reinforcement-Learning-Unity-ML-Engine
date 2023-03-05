@@ -23,15 +23,13 @@ class Actor(nn.Module):
 
         # Define NN architecture.
         self.stacked_layers = nn.Sequential(
-            # nn.BatchNorm1d(observation_size),
-            nn.Linear(observation_size, 128),
-            # nn.BatchNorm1d(128),
+            nn.Linear(observation_size, 512),
             nn.ReLU(),
-            nn.Linear(128, 128),
-            # nn.BatchNorm1d(128),
+            nn.Linear(512, 256),
+            nn.ReLU(),
+            nn.Linear(256, 128),
             nn.ReLU(),
             nn.Linear(128, action_size),
-            # nn.BatchNorm1d(action_size),
             nn.Tanh(),
         )
 
@@ -44,4 +42,4 @@ class Actor(nn.Module):
         :param observations: The observations to get the actions for.
         :return: Vector of actions in range [-1, 1].
         """
-        return self.stacked_layers(observations.reshape(1, -1))
+        return self.stacked_layers(observations)

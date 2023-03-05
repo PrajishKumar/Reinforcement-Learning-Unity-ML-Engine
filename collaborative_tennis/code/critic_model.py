@@ -25,11 +25,11 @@ class Critic(nn.Module):
         # Define NN architecture.
         input_size = (observation_size + action_size) * num_agents
         self.stacked_layers = nn.Sequential(
-            nn.Linear(input_size, 128),
-            # nn.BatchNorm1d(128),
+            nn.Linear(input_size, 512),
             nn.ReLU(),
-            nn.Linear(128, 128),
-            # nn.BatchNorm1d(128),
+            nn.Linear(512, 256),
+            nn.ReLU(),
+            nn.Linear(256, 128),
             nn.ReLU(),
             nn.Linear(128, 1),
         )
@@ -47,4 +47,4 @@ class Critic(nn.Module):
         :param stacked_actions: The actions of all agents stacked.
         :return: The action-value estimate for the corresponding observation-action pair.
         """
-        return self.stacked_layers(torch.cat((stacked_observations, stacked_actions)))
+        return self.stacked_layers(torch.hstack((stacked_observations, stacked_actions)))

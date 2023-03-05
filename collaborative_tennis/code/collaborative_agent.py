@@ -42,12 +42,11 @@ class CollaborativeAgent:
         :param observations: The observations of the agents.
         :return: The actions to take by each agent.
         """
-        actions = [agent.act(observation) for agent, observation in zip(self.agents, observations)]
+        actions = [agent.act_local(observation).cpu().numpy() for agent, observation in zip(self.agents, observations)]
         return np.array(actions)
 
     def step(self, observations, actions, rewards, next_observations, dones):
-        experiences = (observations, actions, rewards, next_observations, dones)
-        self.replay_buffer.add(experiences)
+        self.replay_buffer.add(observations, actions, rewards, next_observations, dones)
 
         # Do not learn if we do not have enough samples to learn from.
         if len(self.replay_buffer) <= BATCH_SIZE:
@@ -58,49 +57,52 @@ class CollaborativeAgent:
         if self.t_step == 0:
             # Sample experiences several times and continue updating parameters.
             for _ in range(NUM_LEARNINGS_PER_UPDATE):
-                for experience in self.replay_buffer.sample():
 
-                    (observations_, actions_, rewards_, next_observations_, dones_) = experience
-                    observations_ = torch.from_numpy(observations_).float().to(self.device)
-                    actions_ = torch.from_numpy(actions_).float().to(self.device)
-                    next_observations_ = torch.from_numpy(next_observations_).float().to(self.device)
+                obs_1, action_1, reward_1, next_obs_1, done_1, obs_2, action_2, reward_2, next_obs_2, done_2 = \
+                    self.replay_buffer.sample()
 
-                    observations_stacked = torch.flatten(observations_)
-                    actions_stacked = torch.flatten(actions_)
-                    next_observations_stacked = torch.flatten(next_observations_)
+                observations_stacked = torch.hstack((obs_1, obs_2)).to(self.device).float()
+                actions_stacked = torch.hstack((action_1, action_2)).to(self.device).float()
+                next_observations_stacked = torch.hstack((next_obs_1, next_obs_2)).to(self.device).float()
 
-                    next_actions_stacked = torch.tensor([], device=self.device)
-                    for agent_idx, agent in enumerate(self.agents):
-                        next_actions = agent.actor_target(next_observations_[agent_idx])
-                        next_actions_stacked = torch.cat((next_actions_stacked, next_actions))
-                    next_actions_stacked = torch.flatten(next_actions_stacked)
+                next_action_1 = self.agents[0].act_target(next_obs_1)
+                next_action_2 = self.agents[1].act_target(next_obs_2)
+                next_actions_stacked = torch.hstack((next_action_1, next_action_2)).to(self.device).detach().float()
 
-                    for agent_idx, agent in enumerate(self.agents):
-                        next_critic_target = agent.critic_target(next_observations_stacked, next_actions_stacked)
-                        critic_target = rewards_[agent_idx] + GAMMA * next_critic_target * (1 - dones_[agent_idx])
-                        critic_expected = agent.critic_local(observations_stacked, actions_stacked)
+                for agent_idx, agent in enumerate(self.agents):
+                    agent.critic_target.eval()
+                    with torch.no_grad():
+                        next_critic_target = agent.critic_target(next_observations_stacked,
+                                                                 next_actions_stacked).detach().to(self.device)
+                    agent.critic_target.train()
 
-                        critic_loss = agent.critic_loss_function(critic_expected, critic_target.detach())
-                        agent.critic_optimizer.zero_grad()
-                        critic_loss.backward()
-                        torch.nn.utils.clip_grad_norm_(agent.critic_local.parameters(), 1)
-                        agent.critic_optimizer.step()
+                    if agent_idx == 0:
+                        critic_target = reward_1 + GAMMA * next_critic_target * (1 - done_1)
+                    else:
+                        critic_target = reward_2 + GAMMA * next_critic_target * (1 - done_2)
+                    critic_expected = agent.critic_local(observations_stacked, actions_stacked)
 
-                    for agent_idx, agent in enumerate(self.agents):
-                        expected_actions_stacked = torch.tensor([], device=self.device)
-                        for agent_idx_, agent_ in enumerate(self.agents):
-                            if agent_idx == agent_idx:
-                                actions_expected = agent_.actor_local(observations_[agent_idx_])
-                            else:
-                                actions_expected = agent_.actor_local(observations_[agent_idx_]).detach()
-                            expected_actions_stacked = torch.cat((expected_actions_stacked, actions_expected))
-                        expected_actions_stacked = torch.flatten(expected_actions_stacked)
+                    critic_loss = agent.critic_loss_function(critic_expected, critic_target.detach())  # todo: l1loss
+                    agent.critic_optimizer.zero_grad()
+                    critic_loss.backward()
+                    torch.nn.utils.clip_grad_norm_(agent.critic_local.parameters(), 1)
+                    agent.critic_optimizer.step()
 
-                        actor_loss = -agent.critic_local(observations_stacked, expected_actions_stacked).mean()
-                        agent.actor_optimizer.zero_grad()
-                        actor_loss.backward()
-                        agent.actor_optimizer.step()
+                for agent_idx, agent in enumerate(self.agents):
+                    if agent_idx == 0:
+                        other_agent = self.agents[1]
+                        expected_actions_stacked = torch.hstack((agent.actor_local(obs_1),
+                                                                 other_agent.act_local(obs_2)))
+                    else:
+                        other_agent = self.agents[0]
+                        expected_actions_stacked = torch.hstack((other_agent.act_local(obs_1),
+                                                                 agent.actor_local(obs_2)))
 
-                    for agent in self.agents:
-                        update_target_network(agent.actor_local, agent.actor_target, TAU)
-                        update_target_network(agent.critic_local, agent.critic_target, TAU)
+                    actor_loss = -agent.critic_local(observations_stacked, expected_actions_stacked).mean()
+                    agent.actor_optimizer.zero_grad()
+                    actor_loss.backward()
+                    agent.actor_optimizer.step()
+
+                for agent in self.agents:
+                    update_target_network(agent.actor_local, agent.actor_target, TAU)
+                    update_target_network(agent.critic_local, agent.critic_target, TAU)

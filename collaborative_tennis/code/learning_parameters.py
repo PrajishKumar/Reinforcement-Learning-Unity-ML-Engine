@@ -9,17 +9,17 @@ GAMMA = 0.99  # discount factor
 LR_ACTOR = 1e-4  # learning rate
 
 # Training the critic
-LR_CRITIC = 3e-4  # learning rate
+LR_CRITIC = 1e-3  # learning rate
 WEIGHT_DECAY = 0
 
 # Target networks
 TAU = 1e-3  # for soft update of target parameters
 
 # DDQN
-UPDATE_EVERY = 10  # how often to update the network
-NUM_LEARNINGS_PER_UPDATE = 2  # how many times we update the networks per UPDATE_EVERY
+UPDATE_EVERY = 1  # how often to update the network
+NUM_LEARNINGS_PER_UPDATE = 1  # how many times we update the networks per UPDATE_EVERY
 
 # Action noise
-MAX_ACTION_STD_DEV = 0.3
+MAX_ACTION_STD_DEV = 0.5
 MIN_ACTION_STD_DEV = 0.01
-DECAY_RATE_ACTION_STD_DEV = 0.99
+DECAY_RATE_ACTION_STD_DEV = 0.995

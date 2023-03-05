@@ -32,7 +32,7 @@ def step_env(env, agent, brain_name, observations, sigma):
     """
     actions = agent.act(observations)
     actions = add_noise(actions, 0., sigma)
-    np.clip(actions, -1, 1)
+    actions = np.clip(actions, -1, 1)
     env_info = env.step(actions)[brain_name]
     next_observations = env_info.vector_observations
     rewards = env_info.rewards
@@ -52,7 +52,7 @@ def save_models(collaborative_agent):
 
 def train(env, brain_name, agent, num_episodes, max_time_per_episode, score_acceptance_threshold, print_every=100):
     """
-    Run the DDPG algorithm to train the agent.
+    Run the MADDPG algorithm to train the agent.
     :param env: The unity environment.
     :param brain_name: The name of the unity agent.
     :param agent: The agent to take the actions and learn from it.
@@ -63,7 +63,9 @@ def train(env, brain_name, agent, num_episodes, max_time_per_episode, score_acce
     :return: The averaged scores and the episode at which the agent scores above the acceptance threshold.
     """
     # Track scores.
+    scores = []
     averaged_scores = deque(maxlen=print_every)
+    previous_average_score = 0.0
     num_episodes_to_acceptance_threshold = None
 
     # Initialize standard deviation for the action noise.
@@ -100,18 +102,22 @@ def train(env, brain_name, agent, num_episodes, max_time_per_episode, score_acce
         sigma = max(MIN_ACTION_STD_DEV, sigma * DECAY_RATE_ACTION_STD_DEV)
 
         # Keep track of scores.
+        scores.append(np.max(score))
         averaged_scores.append(np.max(score))
-        print('\rEpisode {}\tAverage Score: {:.3f}'.format(episode_idx, np.mean(averaged_scores)), end="")
-        if np.mean(averaged_scores) >= score_acceptance_threshold and num_episodes_to_acceptance_threshold is None:
-            num_episodes_to_acceptance_threshold = episode_idx
-            save_models(agent)
-            print(f"\nOur agent learnt to get a score of {score_acceptance_threshold} in "
-                  f"{num_episodes_to_acceptance_threshold} episodes!")
-            break
+        averaged_score = np.mean(averaged_scores)
+        print('\rEpisode {}\tAverage Score: {:.6f}'.format(episode_idx, averaged_score), end="")
+        if averaged_score >= score_acceptance_threshold:
+            if averaged_score > previous_average_score:
+                save_models(agent)
+            if num_episodes_to_acceptance_threshold is None:
+                num_episodes_to_acceptance_threshold = episode_idx
+                print(f"\nOur agent learnt to get a score of {score_acceptance_threshold} in "
+                      f"{num_episodes_to_acceptance_threshold} episodes!")
         if episode_idx % print_every == 0:
-            print('\rEpisode {}\tAverage Score: {:.3f}'.format(episode_idx, np.mean(
-                averaged_scores)))
+            print('\rEpisode {}\tAverage Score: {:.6f}'.format(episode_idx, averaged_score))
+        previous_average_score = averaged_score
 
-    save_models(agent)
+    if num_episodes_to_acceptance_threshold is None:
+        save_models(agent)
 
-    return averaged_scores, num_episodes_to_acceptance_threshold
+    return scores

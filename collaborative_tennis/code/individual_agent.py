@@ -48,19 +48,41 @@ class IndividualAgent:
         # Loss function for the critic.
         self.critic_loss_function = torch.nn.MSELoss()
 
-    def act(self, observations):
+        # set actor_local and actor_target with same weights & biases
+        for local_param, target_param in zip(self.actor_local.parameters(), self.actor_target.parameters()):
+            target_param.data.copy_(local_param.data)
+        for local_param, target_param in zip(self.critic_local.parameters(), self.critic_target.parameters()):
+            target_param.data.copy_(local_param.data)
+
+    def act_local(self, observations):
         """
-        Returns the actions that the agents should take for the current observations.
+        Returns the actions that the local agents should take at current observations.
         :param observations: The observations of the agent.
         :return: The actions to take.
         """
-        states_torch = torch.from_numpy(observations).float().to(self.device)  # numpy -> torch.
+        return self.__act(self.actor_local, observations)
 
-        # Evaluate policy.
-        self.actor_local.eval()
+    def act_target(self, observations):
+        """
+        Returns the actions that the target agents should take at current observations.
+        :param observations: The observations of the agent.
+        :return: The actions to take.
+        """
+        return self.__act(self.actor_target, observations)
+
+    def __act(self, actor, observations):
+        """
+        Returns the actions that the agents should take for the current observations.
+        :param actor: The actor used.
+        :param observations: The observations of the agent.
+        :return: The actions to take.
+        """
+        if type(observations).__module__ == np.__name__:
+            observations = torch.from_numpy(observations).float().to(self.device)  # numpy -> torch.
+
+        actor.eval()
         with torch.no_grad():
-            action = self.actor_local(states_torch).squeeze().cpu().data.numpy()
-        self.actor_local.train()
+            action = actor(observations).float().to(self.device).detach()
+        actor.train()
 
-        # Clip the actions to [-1, 1].
-        return np.clip(action, -1, 1)
+        return action
