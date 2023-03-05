@@ -78,11 +78,11 @@ Performance of the agent after training for 4300 episodes:
 
 #### Plot of score over time of training:
 
-![](https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/main/collaborative_tennis/media/scores_plot.png)
+<img src="https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/main/collaborative_tennis/media/scores_plot.png" width="600" alt="Scores Plot"/>
 
 Our agents received a score of more than 0.5 (averaged over 100 episodes) at episode number 4173.
 However, we decided to run the training for longer in the hope that the agent might end up getting even more scores.
-We stopped when the score was around 1. 
+We stopped when the score was around 1.
 
 ```
 Episode 100	Average Score: 0.003000
@@ -134,22 +134,15 @@ Episode 4300	Average Score: 1.152500
 
 ### Ideas for Future Work
 
-Given that we run an episode for 1000 timesteps, the maximum score an agent can get is $1000 \times 0.1 = 100$.
-Our trained agent gets a score of just above 30 pretty soon, but the score does not really improve after.
-When one looks at the performance of the agent, it visually appears to track just fine.
-
-However, some improvements could be tried:
-
 1. **Implementing a prioritized replay buffer.**
 
-   Our replay buffer has a capacity of 1 million experiences.
-   And for 20 agents, with an episode containing 1000 experiences, it is equivalent to storing 50 episodes worth of
-   experiences.
-   That's a good enough number, however, we see that the agent's behaviour starts converging around 100 episodes.
-   That would mean that the experiences in the buffer, on average, produce the same behavior.
+   Our agent takes way too long to learn how to play.
+   Tweaking some hyperparameters could help, but that doesn't take away the issue that, in our environment, the rewards
+   a
+   little sparse.
 
-   It's at this stage, one might want to treat experiences with higher expected returns favorably.
-   And we can do that by sampling those experiences with higher expected returns with higher probability.
+   So, it becomes important that we favor experiences that produced high rewards when we sample experiences from the
+   replay buffer.
 
 2. **Providing a baseline in the policy improvement step.**
 
@@ -158,8 +151,23 @@ However, some improvements could be tried:
    The idea of a baseline is to selectively favor actions that lead to returns higher than the expected value from the
    baseline.
 
-   This is very useful when the agent seems to have converged to suboptimal behaviors.
+   This might be useful at the start since out agents seems to be not learning that well initially.
    A baseline will roughly split the experiences into two halves - ones from which we can learn to do better and the
    others on what not to do.
-   This selective learning could improve the agent's performance even more. 
+   This selective learning could improve the agents' performance even more.
+
+3. **Applying batch normalization.**
+
+   Applying batch normalization to neural networks is known to help the agent converge
+   faster [source](https://arxiv.org/pdf/1502.03167.pdf).
+   We could have tried that with our actor and critic networks.
+
+4. **Using D4PG over DDPG.**
+
+   Using D4PG seems promising for our
+   application [source](https://www.researchgate.net/publication/348367411_Multi-Agent_Reinforcement_Learning_using_the_Deep_Distributed_Distributional_Deterministic_Policy_Gradients_Algorithm).
+   D4PG is also an off-policy actor-critic learning algorithm but is known to provide better gradients and thus more
+   stable learning signal.
+   Moreover, the D4PG algorithm runs many actors in parallel with all feeding into a single replay buffer, executing a
+   sophisticated distributed way to gather the experience, and as a result, a significant time saving can be achieved.
 

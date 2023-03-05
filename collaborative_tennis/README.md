@@ -62,7 +62,7 @@ python -m ipykernel install --user --name collaborative_tennis --display-name "c
 5. Open the notebook. 
 
 ```bash
-jupyter notebook ArmReacher.ipynb
+jupyter notebook CollaborativeTennis.ipynb
 ```
 
 6. Before running code in a notebook, change the kernel to match the `collaborative_tennis` environment. 
