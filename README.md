@@ -14,3 +14,10 @@ Performance of the agent after training to pick only the yellow bananas:
 Performance of the agent (robotic arm) after training to track the moving green targets:
 
 ![](https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/main/arm_reacher/media/successful_test.gif)
+
+
+## Project: Collaborative Tennis with MADDPG ([more details](https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/tree/main/collaborative_tennis))
+
+Performance of the agents (tennis rackets) after training to keep passing the ball to each other without dropping. 
+
+![](https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/main/collaborative_tennis/media/successful_test.gif)

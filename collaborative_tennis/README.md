@@ -10,9 +10,9 @@ The environment contains two agents in control of a racket each.
 The task is to pass the ball to the other court (to the other agent), while not letting the ball touch the floor or go out of bounds.
 
 We use the Unity ML-Agents environment. This is performed as part of a project for the course Deep Reinforcement Learning Nanodegree.
-See example below. 
+See example below.
 
-![Trained Agent][image1]
+<img src="https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/main/collaborative_tennis/media/successful_test.gif" width="300" alt=""/>
 
 If an agent hits the ball over the net, it receives a reward of +0.1. 
 If an agent lets a ball hit the ground or hits the ball out of bounds, it receives a reward of -0.01. 

@@ -76,9 +76,9 @@ Performance of the agent after training for 4300 episodes:
 
 ![](https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/main/collaborative_tennis/media/successful_test.gif)
 
-Plot of score over time of training:
+#### Plot of score over time of training:
 
-![](https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/main/collaborative_tennis/media/scores_plot.gif)
+![](https://github.com/PrajishKumar/Reinforcement-Learning-Unity-ML-Engine/blob/main/collaborative_tennis/media/scores_plot.png)
 
 Our agents received a score of more than 0.5 (averaged over 100 episodes) at episode number 4173.
 However, we decided to run the training for longer in the hope that the agent might end up getting even more scores.
