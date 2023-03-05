@@ -11,6 +11,8 @@ from utils import update_target_network
 class CollaborativeAgent:
     """
     Contains all the individual agents and trains them together.
+
+    Implements the MADDPG algorithm.
     """
 
     def __init__(self, num_agents, observation_size, action_size, device, seed=0):
@@ -55,12 +57,13 @@ class CollaborativeAgent:
         # Learn every UPDATE_EVERY time steps.
         self.t_step = (self.t_step + 1) % UPDATE_EVERY
         if self.t_step == 0:
-            # Sample experiences several times and continue updating parameters.
             for _ in range(NUM_LEARNINGS_PER_UPDATE):
 
+                # Sample from replay buffer.
                 obs_1, action_1, reward_1, next_obs_1, done_1, obs_2, action_2, reward_2, next_obs_2, done_2 = \
                     self.replay_buffer.sample()
 
+                # Stack observations and actions that will be used as inputs to the critic networks later.
                 observations_stacked = torch.hstack((obs_1, obs_2)).to(self.device).float()
                 actions_stacked = torch.hstack((action_1, action_2)).to(self.device).float()
                 next_observations_stacked = torch.hstack((next_obs_1, next_obs_2)).to(self.device).float()
@@ -69,6 +72,7 @@ class CollaborativeAgent:
                 next_action_2 = self.agents[1].act_target(next_obs_2)
                 next_actions_stacked = torch.hstack((next_action_1, next_action_2)).to(self.device).detach().float()
 
+                # Improve the critic.
                 for agent_idx, agent in enumerate(self.agents):
                     agent.critic_target.eval()
                     with torch.no_grad():
@@ -82,12 +86,13 @@ class CollaborativeAgent:
                         critic_target = reward_2 + GAMMA * next_critic_target * (1 - done_2)
                     critic_expected = agent.critic_local(observations_stacked, actions_stacked)
 
-                    critic_loss = agent.critic_loss_function(critic_expected, critic_target.detach())  # todo: l1loss
+                    critic_loss = agent.critic_loss_function(critic_expected, critic_target.detach())
                     agent.critic_optimizer.zero_grad()
                     critic_loss.backward()
                     torch.nn.utils.clip_grad_norm_(agent.critic_local.parameters(), 1)
                     agent.critic_optimizer.step()
 
+                # Improve the actor.
                 for agent_idx, agent in enumerate(self.agents):
                     if agent_idx == 0:
                         other_agent = self.agents[1]
@@ -103,6 +108,7 @@ class CollaborativeAgent:
                     actor_loss.backward()
                     agent.actor_optimizer.step()
 
+                # Update the target networks.
                 for agent in self.agents:
                     update_target_network(agent.actor_local, agent.actor_target, TAU)
                     update_target_network(agent.critic_local, agent.critic_target, TAU)

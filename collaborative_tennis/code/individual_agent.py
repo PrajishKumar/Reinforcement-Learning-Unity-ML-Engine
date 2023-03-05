@@ -48,7 +48,7 @@ class IndividualAgent:
         # Loss function for the critic.
         self.critic_loss_function = torch.nn.MSELoss()
 
-        # set actor_local and actor_target with same weights & biases
+        # Set the parameters of the target networks to that of the local networks.
         for local_param, target_param in zip(self.actor_local.parameters(), self.actor_target.parameters()):
             target_param.data.copy_(local_param.data)
         for local_param, target_param in zip(self.critic_local.parameters(), self.critic_target.parameters()):
@@ -77,8 +77,8 @@ class IndividualAgent:
         :param observations: The observations of the agent.
         :return: The actions to take.
         """
-        if type(observations).__module__ == np.__name__:
-            observations = torch.from_numpy(observations).float().to(self.device)  # numpy -> torch.
+        if type(observations).__module__ == np.__name__:  # if type numpy, convert to torch.
+            observations = torch.from_numpy(observations).float().to(self.device)
 
         actor.eval()
         with torch.no_grad():

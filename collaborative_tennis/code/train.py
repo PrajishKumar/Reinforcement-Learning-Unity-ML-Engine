@@ -17,11 +17,11 @@ def add_noise(signal, mean, sigma):
     return signal
 
 
-def step_env(env, agent, brain_name, observations, sigma):
+def step_env(env, collaborative_agent, brain_name, observations, sigma):
     """
     Helper function to step once in the environment.
     :param env: The unity environment.
-    :param agent: The agent to take the actions and learn from it.
+    :param collaborative_agent: The collaborative agent to take the actions and learn from it.
     :param brain_name: The name of the unity agent.
     :param observations: The observations of the agents.
     :param sigma: Standard deviation for the noise to be applied on the actions.
@@ -30,7 +30,7 @@ def step_env(env, agent, brain_name, observations, sigma):
                  (3) the next state of the environments
                  (4) flags indication terminal states
     """
-    actions = agent.act(observations)
+    actions = collaborative_agent.act(observations)
     actions = add_noise(actions, 0., sigma)
     actions = np.clip(actions, -1, 1)
     env_info = env.step(actions)[brain_name]
@@ -50,15 +50,17 @@ def save_models(collaborative_agent):
         torch.save(agent.critic_local.state_dict(), f'../model/trained_critic_{agent_idx}.pt')
 
 
-def train(env, brain_name, agent, num_episodes, max_time_per_episode, score_acceptance_threshold, print_every=100):
+def train(env, brain_name, collaborative_agent, num_episodes, max_time_per_episode, score_acceptance_threshold,
+          max_score_acceptance_threshold, print_every=100):
     """
     Run the MADDPG algorithm to train the agent.
     :param env: The unity environment.
     :param brain_name: The name of the unity agent.
-    :param agent: The agent to take the actions and learn from it.
+    :param collaborative_agent: The collaborative agent to take the actions and learn from it.
     :param num_episodes: Maximum number of episodes.
     :param max_time_per_episode: Amount of timesteps to let the agent interact with the environment per episode.
     :param score_acceptance_threshold: The target score.
+    :param max_score_acceptance_threshold: The score at which the training stops.
     :param print_every: The episodes after which the scores are printed.
     :return: The averaged scores and the episode at which the agent scores above the acceptance threshold.
     """
@@ -82,10 +84,11 @@ def train(env, brain_name, agent, num_episodes, max_time_per_episode, score_acce
 
         for t in range(max_time_per_episode):
             # Step once in the environment.
-            actions, rewards, next_observations, dones = step_env(env, agent, brain_name, observations, sigma)
+            actions, rewards, next_observations, dones = step_env(env, collaborative_agent, brain_name, observations,
+                                                                  sigma)
 
             # Learn from the experiences.
-            agent.step(observations, actions, rewards, next_observations, dones)
+            collaborative_agent.step(observations, actions, rewards, next_observations, dones)
 
             # Update the state vector.
             observations = next_observations
@@ -108,16 +111,18 @@ def train(env, brain_name, agent, num_episodes, max_time_per_episode, score_acce
         print('\rEpisode {}\tAverage Score: {:.6f}'.format(episode_idx, averaged_score), end="")
         if averaged_score >= score_acceptance_threshold:
             if averaged_score > previous_average_score:
-                save_models(agent)
+                save_models(collaborative_agent)
             if num_episodes_to_acceptance_threshold is None:
                 num_episodes_to_acceptance_threshold = episode_idx
                 print(f"\nOur agent learnt to get a score of {score_acceptance_threshold} in "
                       f"{num_episodes_to_acceptance_threshold} episodes!")
         if episode_idx % print_every == 0:
             print('\rEpisode {}\tAverage Score: {:.6f}'.format(episode_idx, averaged_score))
+            if averaged_score >= max_score_acceptance_threshold:
+                break
         previous_average_score = averaged_score
 
     if num_episodes_to_acceptance_threshold is None:
-        save_models(agent)
+        save_models(collaborative_agent)
 
     return scores
